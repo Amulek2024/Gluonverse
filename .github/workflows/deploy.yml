@@ -1,0 +1,124 @@
+name: Deploy Gluonverse
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: rg-gluonverse
+  CONTAINERAPP_ENV: gluonverse-backend-env
+  LOCATION: brazilsouth
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_fqdn: ${{ steps.get-fqdn.outputs.fqdn }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to ACR
+        run: az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+
+      - name: Build and push backend image
+        run: |
+          IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/gluonverse-backend:${{ github.sha }}
+          docker build -t "$IMAGE" ./backend
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy to Azure Container Apps
+        run: |
+          az extension add --name containerapp --upgrade -y
+          az containerapp up \
+            -n gluonverse-backend \
+            -g "$RESOURCE_GROUP" \
+            --location "$LOCATION" \
+            --environment "$CONTAINERAPP_ENV" \
+            --image "$IMAGE" \
+            --ingress external \
+            --target-port 8000 \
+            --env-vars GLUONVERSE_DATA_DIR=/app/data/simulations GLUONVERSE_EXPORT_DIR=/app/data/exports GLUONVERSE_DATABASE_URL=sqlite:////app/data/simulations/gluonverse.sqlite3 GLUONVERSE_MAX_PARTICLES=64 GLUONVERSE_MAX_LATTICE_SIZE=16 GLUONVERSE_MAX_STEPS=100000
+
+      - name: Get backend FQDN
+        id: get-fqdn
+        run: |
+          FQDN=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn -o tsv)
+          echo "fqdn=$FQDN" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        run: |
+          FQDN=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn -o tsv)
+          for i in $(seq 1 15); do
+            if curl -sf "https://$FQDN/health"; then
+              echo "Backend healthy at https://$FQDN"
+              exit 0
+            fi
+            echo "Waiting for backend health... ($i)"
+            sleep 10
+          done
+          echo "Backend health check failed"
+          exit 1
+
+  deploy-frontend:
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to ACR
+        run: az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+
+      - name: Build and push frontend image
+        env:
+          BACKEND_FQDN: ${{ needs.deploy-backend.outputs.backend_fqdn }}
+        run: |
+          IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/gluonverse-frontend:${{ github.sha }}
+          docker build \
+            --build-arg VITE_API_BASE_URL="https://$BACKEND_FQDN" \
+            --build-arg VITE_WS_BASE_URL="wss://$BACKEND_FQDN" \
+            -t "$IMAGE" ./frontend
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy to Azure Container Apps
+        run: |
+          az extension add --name containerapp --upgrade -y
+          az containerapp up \
+            -n gluonverse-frontend \
+            -g "$RESOURCE_GROUP" \
+            --location "$LOCATION" \
+            --environment "$CONTAINERAPP_ENV" \
+            --image "$IMAGE" \
+            --ingress external \
+            --target-port 80
+
+      - name: Health check
+        run: |
+          FQDN=$(az containerapp show -n gluonverse-frontend -g "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn -o tsv)
+          for i in $(seq 1 15); do
+            if curl -sf "https://$FQDN/"; then
+              echo "Frontend healthy at https://$FQDN"
+              exit 0
+            fi
+            echo "Waiting for frontend health... ($i)"
+            sleep 10
+          done
+          echo "Frontend health check failed"
+          exit 1
