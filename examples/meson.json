@@ -1,0 +1,24 @@
+{
+  "name": "Meson educational preset",
+  "simulation_type": "meson",
+  "dimensions": 3,
+  "time_step": 0.001,
+  "steps": 800,
+  "integrator": "velocity_verlet",
+  "random_seed": 7,
+  "particles": [
+    {
+      "flavor": "down",
+      "color_charge": "blue",
+      "position": [-0.42, 0.0, 0.0],
+      "velocity": [0.0, 0.08, 0.0]
+    },
+    {
+      "flavor": "anti-down",
+      "color_charge": "anti-blue",
+      "position": [0.42, 0.0, 0.0],
+      "velocity": [0.0, -0.08, 0.0]
+    }
+  ]
+}
+
