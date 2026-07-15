@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: gluonverse-backend
+    runtime: docker
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: GLUONVERSE_DATA_DIR
+        value: /app/data/simulations
+      - key: GLUONVERSE_EXPORT_DIR
+        value: /app/data/exports
+      - key: GLUONVERSE_DATABASE_URL
+        value: sqlite:////app/data/simulations/gluonverse.sqlite3
+      - key: GLUONVERSE_MAX_PARTICLES
+        value: 64
+      - key: GLUONVERSE_MAX_LATTICE_SIZE
+        value: 16
+      - key: GLUONVERSE_MAX_STEPS
+        value: 100000
+
+  - type: web
+    name: gluonverse-frontend
+    runtime: docker
+    plan: free
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      # NOTE: update these to the real backend URL Render assigns after the
+      # backend service's first deploy, then redeploy this service.
+      - key: VITE_API_BASE_URL
+        value: https://gluonverse-backend.onrender.com
+      - key: VITE_WS_BASE_URL
+        value: wss://gluonverse-backend.onrender.com
