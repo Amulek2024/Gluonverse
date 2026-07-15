@@ -48,6 +48,9 @@ jobs:
             --image "$IMAGE" \
             --ingress external \
             --target-port 8000 \
+            --registry-server "${{ secrets.ACR_LOGIN_SERVER }}" \
+            --registry-username "${{ secrets.ACR_USERNAME }}" \
+            --registry-password "${{ secrets.ACR_PASSWORD }}" \
             --env-vars GLUONVERSE_DATA_DIR=/app/data/simulations GLUONVERSE_EXPORT_DIR=/app/data/exports GLUONVERSE_DATABASE_URL=sqlite:////app/data/simulations/gluonverse.sqlite3 GLUONVERSE_MAX_PARTICLES=64 GLUONVERSE_MAX_LATTICE_SIZE=16 GLUONVERSE_MAX_STEPS=100000
 
       - name: Get backend FQDN
@@ -107,7 +110,10 @@ jobs:
             --environment "$CONTAINERAPP_ENV" \
             --image "$IMAGE" \
             --ingress external \
-            --target-port 80
+            --target-port 80 \
+            --registry-server "${{ secrets.ACR_LOGIN_SERVER }}" \
+            --registry-username "${{ secrets.ACR_USERNAME }}" \
+            --registry-password "${{ secrets.ACR_PASSWORD }}"
 
       - name: Health check
         run: |
