@@ -70,7 +70,7 @@ jobs:
         run: |
           LATEST=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
           echo "Activating: $LATEST"
-          az containerapp revision activate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST"
+          az containerapp revision activate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST" || true
 
       - name: Get backend FQDN
         id: get-fqdn
@@ -155,7 +155,7 @@ jobs:
         run: |
           LATEST=$(az containerapp show -n gluonverse-frontend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
           echo "Activating: $LATEST"
-          az containerapp revision activate -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision "$LATEST"
+          az containerapp revision activate -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision "$LATEST" || true
 
       - name: Health check
         run: |
