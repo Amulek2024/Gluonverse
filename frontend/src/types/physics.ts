@@ -36,6 +36,7 @@ export type ViewId =
   | "atomos"
   | "moleculas"
   | "interacciones"
+  | "electromagnetismo"
   | "gravedad"
   | "comparador"
   | "historial"

@@ -307,6 +307,7 @@ label {
 .atomos-grid,
 .moleculas-grid,
 .interacciones-grid,
+.electromagnetismo-grid,
 .gravedad-grid {
   display: grid;
   grid-template-columns: minmax(26rem, 1fr) minmax(24rem, 1.4fr);
@@ -656,6 +657,7 @@ label {
   .atomos-grid,
   .moleculas-grid,
   .interacciones-grid,
+  .electromagnetismo-grid,
   .gravedad-grid {
     grid-template-columns: 1fr;
   }

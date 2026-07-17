@@ -15,7 +15,8 @@ import {
   Network,
   Orbit,
   PauseCircle,
-  Waves
+  Waves,
+  Zap
 } from "lucide-react";
 import { EnergyChart } from "./components/EnergyChart";
 import { ObservablesPanel } from "./components/ObservablesPanel";
@@ -27,6 +28,7 @@ import { SimulationControls } from "./controls/SimulationControls";
 import { GravityControls } from "./controls/GravityControls";
 import { MoleculeControls } from "./controls/MoleculeControls";
 import { AtomSandboxControls } from "./controls/AtomSandboxControls";
+import { ElectromagnetismControls } from "./controls/ElectromagnetismControls";
 import { health, listSimulations } from "./api/client";
 import { useSimulationStore } from "./stores/useSimulationStore";
 import { AtomScene } from "./scenes/AtomScenePlaceholder";
@@ -35,6 +37,7 @@ import { LatticeScene } from "./scenes/LatticeScenePlaceholder";
 import { GravityScene } from "./scenes/GravityScenePlaceholder";
 import { MoleculeScene } from "./scenes/MoleculeScenePlaceholder";
 import { AtomSandboxScene } from "./scenes/AtomSandboxScenePlaceholder";
+import { ElectromagnetismScene } from "./scenes/ElectromagnetismScenePlaceholder";
 import type { ViewId } from "./types/physics";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error?: Error }> {
@@ -73,6 +76,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: typeof Home }> = [
   { id: "atomos", label: "Atomos", icon: Atom },
   { id: "moleculas", label: "Moleculas", icon: Boxes },
   { id: "interacciones", label: "Interacciones", icon: Magnet },
+  { id: "electromagnetismo", label: "Electromagnetismo", icon: Zap },
   { id: "gravedad", label: "Gravedad", icon: Orbit },
   { id: "comparador", label: "Comparador", icon: GitCompare },
   { id: "historial", label: "Historial", icon: Archive },
@@ -285,6 +289,23 @@ function AtomSandboxView() {
       <section className="stage" aria-label="Sandbox de interaccion entre atomos">
         <div className="scene-frame">
           <AtomSandboxScene />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function ElectromagnetismView() {
+  const controlsSlot = useSimulationStore((state) => state.controlsSlot);
+  return (
+    <main className="workspace electromagnetismo-grid">
+      <div className="left-column">
+        {controlsSlot ? createPortal(<ElectromagnetismControls embedded />, controlsSlot) : <ElectromagnetismControls />}
+        <ScientificNotice scope="electromagnetismo" />
+      </div>
+      <section className="stage" aria-label="Sandbox de electromagnetismo">
+        <div className="scene-frame">
+          <ElectromagnetismScene />
         </div>
       </section>
     </main>
@@ -519,6 +540,16 @@ function DocumentationView() {
               automatica de enlaces por proximidad geometrica. No calcula orbitales
               moleculares, energia de enlace real, ni orden de enlace -- es una heuristica
               geometrica, no una simulacion de dinamica molecular ni de quimica cuantica.
+            </p>
+          </article>
+          <article>
+            <h3>Electromagnetismo</h3>
+            <p>
+              Cargas positivas/negativas que se atraen o repelen segun la Ley de Coulomb real,
+              integradas con el metodo de Boris (el estandar en fisica de plasmas para la
+              fuerza de Lorentz F=q(v x B), que depende de la velocidad). Incluye un campo
+              magnetico uniforme opcional. Sin radiacion electromagnetica: una carga acelerada
+              (p.ej. en orbita) no pierde energia aqui, a diferencia de la electrodinamica real.
             </p>
           </article>
         </div>
@@ -874,6 +905,52 @@ function DocumentationView() {
           </article>
         </div>
 
+        <h2 className="doc-section-title">Electromagnetismo: que es real y que es aproximacion</h2>
+        <div className="doc-grid">
+          <article>
+            <h3>Ley de Coulomb real, constantes de visualizacion</h3>
+            <p>
+              La fuerza entre dos cargas es F = k*q1*q2/r^2, la Ley de Coulomb real (repulsiva
+              entre signos iguales, atractiva entre signos opuestos). k y el suavizado
+              (softening, que evita una fuerza infinita a distancia cero) son constantes de
+              visualizacion adimensionales, no los valores SI reales.
+            </p>
+          </article>
+          <article>
+            <h3>Fuerza de Lorentz e integrador de Boris</h3>
+            <p>
+              Si el campo magnetico esta activo, cada carga en movimiento tambien siente F =
+              q*(v x B), con B UNIFORME a lo largo del eje Z -- no generado por las cargas
+              (sin ecuaciones de Biot-Savart). Esta fuerza depende de la velocidad, por lo que
+              no se integra con Velocity Verlet (usado en Gravedad/Laboratorio): se usa el
+              metodo de Boris (Boris, 1970), el estandar en fisica de plasmas y simulaciones
+              particle-in-cell para exactamente este problema.
+            </p>
+          </article>
+          <article>
+            <h3>Por que el "atomo clasico" es inestable en la realidad</h3>
+            <p>
+              El preset "Atomo clasico" muestra una carga negativa orbitando una positiva solo
+              por atraccion de Coulomb -- el modelo de Rutherford/Bohr anterior a la mecanica
+              cuantica. Una carga en orbita esta constantemente acelerando, y la electrodinamica
+              clasica de Maxwell predice que una carga acelerada irradia energia
+              electromagnetica: un electron orbitando asi caeria en espiral al nucleo en una
+              fraccion de segundo. Esta simulacion <strong>no</strong> modela radiacion, asi que
+              la orbita se mantiene estable indefinidamente -- es, a proposito, el problema
+              historico que motivo la mecanica cuantica (ver la vista Atomos).
+            </p>
+          </article>
+          <article>
+            <h3>Lineas de campo electrico: solo direccion</h3>
+            <p>
+              Las lineas azuladas muestran la direccion del campo E neto (suma vectorial de
+              cada carga) en una grilla de puntos del plano z=0, con longitud FIJA -- no
+              proporcional a la magnitud real del campo, para no saturar la escena cerca de una
+              carga. La opacidad si aumenta con la magnitud relativa.
+            </p>
+          </article>
+        </div>
+
         <h2 className="doc-section-title">Como validar los resultados</h2>
         <div className="doc-grid">
           <article>
@@ -961,6 +1038,7 @@ export default function App() {
         {activeView === "atomos" && <AtomView />}
         {activeView === "moleculas" && <MoleculeView />}
         {activeView === "interacciones" && <AtomSandboxView />}
+        {activeView === "electromagnetismo" && <ElectromagnetismView />}
         {activeView === "gravedad" && <GravityView />}
         {activeView === "comparador" && <CompareView />}
         {activeView === "historial" && <HistoryView />}

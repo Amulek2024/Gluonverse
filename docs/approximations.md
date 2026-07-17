@@ -154,6 +154,38 @@ Gluonverse uses explicit approximation labels throughout the API and UI.
 - Atom count is capped (16) because each atom renders a full nucleus + periodically-resampled
   electron cloud, the same per-atom cost as the Atomic Model view.
 
+## Electromagnetism
+
+- The force between two charges is the real Coulomb's law, `F = k*q1*q2/r^2`, repulsive for
+  like signs and attractive for opposite signs. `k` and the softening length (which prevents an
+  infinite force at zero separation, same Plummer-style regularization as `gravity.ts`) are
+  dimensionless visualization constants, not the real SI value of the Coulomb constant.
+- If the optional magnetic field is enabled, every moving charge additionally feels the real
+  Lorentz force `F = q*(v x B)`, with `B` a UNIFORM field along the Z axis only -- not sourced
+  by the charges themselves (no Biot-Savart law, no relativistic Lienard-Wiechert potentials,
+  no electromagnetic radiation from accelerating charges).
+- Because the Lorentz force depends on velocity (unlike Coulomb's force, which depends only on
+  position), this module does **not** use the Velocity Verlet integrator shared by
+  `gravity.ts`/`cornell.py`. It uses the Boris method (Boris, 1970), the standard integrator in
+  plasma physics and particle-in-cell simulations for exactly this equation of motion: each
+  step splits into a half electric "kick", an exact rotation by the magnetic field (which
+  conserves the perpendicular speed with no angular truncation error), and a second half
+  electric kick. With the magnetic field disabled, this reduces to a symplectic-Euler-like
+  scheme (bounded energy error, no secular drift, but not as tightly energy-conserving
+  per-step as Velocity Verlet) -- an accepted trade-off for using one unified integrator across
+  both the electric-only and electric-plus-magnetic cases.
+- The "Atomo clasico" (classical atom) preset is a deliberately unstable-in-reality
+  demonstration: a negative charge in circular Coulomb orbit around a positive one, the
+  pre-quantum Rutherford/Bohr model. A real orbiting (thus constantly accelerating) charge
+  radiates electromagnetic energy per classical electrodynamics and would spiral into the
+  nucleus in a fraction of a second -- the historical problem that motivated quantum mechanics
+  (see the Atomic Model). Since this simulation does not model radiation, the orbit remains
+  stable indefinitely, which is explicitly flagged as physically incorrect for a real charge.
+- The electric-field lines are a direction-only visualization: fixed-length line segments
+  (not scaled by the real field magnitude, to avoid oversized arrows near a charge) sampled on
+  a grid in the z=0 plane, with opacity increasing with relative magnitude. They are not a true
+  field-line integration (streamlines), just per-point direction samples.
+
 ## Scientific Rigor Boundary
 
 Only validated quantities with documented formulas should be treated as
