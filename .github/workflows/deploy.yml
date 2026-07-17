@@ -106,10 +106,14 @@ jobs:
           BACKEND_FQDN: ${{ needs.deploy-backend.outputs.backend_fqdn }}
         run: |
           IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/gluonverse-frontend:${{ github.sha }}
-          docker build \
+          docker build --no-cache \
             --build-arg VITE_API_BASE_URL="https://$BACKEND_FQDN" \
             --build-arg VITE_WS_BASE_URL="wss://$BACKEND_FQDN" \
             -t "$IMAGE" ./frontend
+          echo "--- Asset filenames baked into this image ---"
+          docker run --rm "$IMAGE" ls -la /usr/share/nginx/html/assets/
+          echo "--- Grep built CSS for our current accent color (7ba7d1) ---"
+          docker run --rm "$IMAGE" sh -c 'grep -c 7ba7d1 /usr/share/nginx/html/assets/*.css || echo NOT_FOUND'
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
