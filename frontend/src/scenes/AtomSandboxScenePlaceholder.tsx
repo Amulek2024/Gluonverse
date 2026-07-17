@@ -209,12 +209,12 @@ export function AtomSandboxScene() {
       </div>
       <div className="scene-legend" aria-hidden="true">
         <strong>
-          Interaccion tipo Lennard-Jones (radios covalentes reales si el par puede enlazar, van
-          der Waals si alguno es gas noble). Fisica: {simPaused ? "en pausa" : "corriendo"}.
+          Lennard-Jones: radios covalentes si el par puede enlazar, van der Waals si es gas
+          noble. Fisica: {simPaused ? "en pausa" : "corriendo"}.
         </strong>
         <span>
           <span className="legend-swatch" style={{ background: BOND_LINE_COLOR }} /> enlace
-          detectado por proximidad (heuristica geometrica, no calcula orden de enlace)
+          detectado por proximidad
         </span>
       </div>
       <button

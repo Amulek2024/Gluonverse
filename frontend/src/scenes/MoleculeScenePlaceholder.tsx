@@ -311,9 +311,8 @@ export function MoleculeScene() {
       </div>
       <div className="scene-legend" aria-hidden="true">
         <strong>
-          Cada atomo es el mismo modelo hidrogenoide de la vista Atomos, trasladado a su posicion
-          de enlace real. La nube blanca entre nucleos es un orbital molecular de enlace (LCAO),
-          con hibridacion sp/sp2/sp3 inferida del angulo real de enlace en atomos con 2+ enlaces.
+          Atomos: modelo hidrogenoide de Atomos, en su posicion de enlace real. Nube blanca:
+          orbital molecular de enlace (LCAO), hibridacion sp/sp2/sp3 inferida del angulo real.
         </strong>
         <span><span className="legend-swatch" style={{ background: BOND_ORBITAL_COLOR }} /> orbital de enlace (LCAO)</span>
         <span><span className="legend-swatch" style={{ background: BOND_COLOR_BY_ORDER[1] }} /> enlace simple</span>
