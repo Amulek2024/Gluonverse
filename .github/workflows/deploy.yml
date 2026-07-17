@@ -53,6 +53,11 @@ jobs:
             --registry-password "${{ secrets.ACR_PASSWORD }}" \
             --env-vars GLUONVERSE_DATA_DIR=/app/data/simulations GLUONVERSE_EXPORT_DIR=/app/data/exports GLUONVERSE_DATABASE_URL=sqlite:////app/data/simulations/gluonverse.sqlite3 GLUONVERSE_MAX_PARTICLES=64 GLUONVERSE_MAX_LATTICE_SIZE=16 GLUONVERSE_MAX_STEPS=100000
 
+      - name: Force single-revision mode and full traffic to latest
+        run: |
+          az containerapp revision set-mode -n gluonverse-backend -g "$RESOURCE_GROUP" --mode single
+          az containerapp ingress traffic set -n gluonverse-backend -g "$RESOURCE_GROUP" --revision-weight latest=100
+
       - name: Get backend FQDN
         id: get-fqdn
         run: |
@@ -114,6 +119,11 @@ jobs:
             --registry-server "${{ secrets.ACR_LOGIN_SERVER }}" \
             --registry-username "${{ secrets.ACR_USERNAME }}" \
             --registry-password "${{ secrets.ACR_PASSWORD }}"
+
+      - name: Force single-revision mode and full traffic to latest
+        run: |
+          az containerapp revision set-mode -n gluonverse-frontend -g "$RESOURCE_GROUP" --mode single
+          az containerapp ingress traffic set -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision-weight latest=100
 
       - name: Health check
         run: |
