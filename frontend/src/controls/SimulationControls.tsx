@@ -184,7 +184,7 @@ export function SimulationControls({ embedded = false }: { embedded?: boolean } 
         <h2 id="controls-heading">Control</h2>
         <span>{status}</span>
       </div>
-      <div className="toolbar">
+      <div className="toolbar toolbar-grid">
         <button
           type="button"
           onClick={runBackend}
@@ -345,7 +345,7 @@ export function SimulationControls({ embedded = false }: { embedded?: boolean } 
           SU(3) 4x4
         </button>
       </div>
-      <div className="toolbar">
+      <div className="toolbar toolbar-grid">
         <button
           type="button"
           onClick={() => addParticle()}

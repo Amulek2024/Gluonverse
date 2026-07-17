@@ -57,7 +57,7 @@ export function MoleculeControls({ embedded = false }: { embedded?: boolean } = 
             className={`particle-row${mol.id === selectedMoleculeId ? " selected" : ""}`}
             onClick={() => setSelectedMolecule(mol.id)}
           >
-            <span className="swatch" style={{ backgroundColor: "#4dd0e1" }} aria-hidden="true" />
+            <span className="swatch" style={{ backgroundColor: "#7ba7d1" }} aria-hidden="true" />
             <span>
               <strong>{mol.formula}</strong>
               <small>{mol.name}</small>
