@@ -218,10 +218,10 @@ export function GravityScene() {
   return (
     <div
       ref={fullscreenRef}
-      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#05070d" }}
+      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#000000" }}
     >
       <Canvas camera={{ position: [3, 2, 4], fov: 50, near: 0.01, far: 20000 }} dpr={[1, 2]}>
-        <color attach="background" args={["#05070d"]} />
+        <color attach="background" args={["#000000"]} />
         <ambientLight intensity={0.45} />
         <pointLight position={[5, 4, 6]} intensity={1.2} />
         <pointLight position={[-5, -3, -4]} intensity={0.4} color="#4dd0e1" />

@@ -136,7 +136,7 @@ function FieldDisc({ visible, reducedMotion }: { visible: boolean; reducedMotion
 function SceneContent({ particles, selectedId, showFields, reducedMotion, onSelect }: GluonSceneProps) {
   return (
     <>
-      <color attach="background" args={["#070A10"]} />
+      <color attach="background" args={["#000000"]} />
       <ambientLight intensity={0.42} />
       <pointLight position={[3.2, 3.5, 2.5]} intensity={3.2} color="#FFFFFF" />
       <pointLight position={[-2.5, -1.8, -2.2]} intensity={1.2} color="#4DD0E1" />

@@ -17,7 +17,7 @@ function Content({ cells, size }: Props) {
   const offset = (size - 1) / 2;
   return (
     <>
-      <color attach="background" args={["#070A10"]} />
+      <color attach="background" args={["#000000"]} />
       <ambientLight intensity={0.5} />
       <pointLight position={[3, 4, 3]} intensity={2.4} />
       {cells.map((cell) => (

@@ -229,14 +229,14 @@ export function GluonScene({ particles: initialParticles, selectedId, showFields
   return (
     <div
       ref={fullscreenRef}
-      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#0b0f1a" }}
+      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#000000" }}
     >
       <Canvas
         camera={{ position: [1.6, 1.2, 1.8], fov: 50, near: 0.01, far: 20000 }}
         dpr={[1, 2]}
         onPointerMissed={() => onSelect?.(undefined)}
       >
-        <color attach="background" args={["#0b0f1a"]} />
+        <color attach="background" args={["#000000"]} />
         <SceneContents
           particles={particlesToShow}
           selectedId={selectedId}

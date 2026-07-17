@@ -6,6 +6,7 @@ import {
   Archive,
   Atom,
   BookOpen,
+  Boxes,
   BrainCircuit,
   FlaskConical,
   GitCompare,
@@ -23,12 +24,14 @@ import { AtomControls } from "./controls/AtomControls";
 import { LatticeControls } from "./controls/LatticeControls";
 import { SimulationControls } from "./controls/SimulationControls";
 import { GravityControls } from "./controls/GravityControls";
+import { MoleculeControls } from "./controls/MoleculeControls";
 import { health, listSimulations } from "./api/client";
 import { useSimulationStore } from "./stores/useSimulationStore";
 import { AtomScene } from "./scenes/AtomScenePlaceholder";
 import { GluonScene } from "./scenes/GluonScenePlaceholder";
 import { LatticeScene } from "./scenes/LatticeScenePlaceholder";
 import { GravityScene } from "./scenes/GravityScenePlaceholder";
+import { MoleculeScene } from "./scenes/MoleculeScenePlaceholder";
 import type { ViewId } from "./types/physics";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error?: Error }> {
@@ -65,6 +68,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: typeof Home }> = [
   { id: "laboratorio", label: "Laboratorio", icon: FlaskConical },
   { id: "lattice", label: "Lattice", icon: Network },
   { id: "atomos", label: "Atomos", icon: Atom },
+  { id: "moleculas", label: "Moleculas", icon: Boxes },
   { id: "gravedad", label: "Gravedad", icon: Orbit },
   { id: "comparador", label: "Comparador", icon: GitCompare },
   { id: "historial", label: "Historial", icon: Archive },
@@ -243,6 +247,23 @@ function AtomView() {
       <section className="stage" aria-label="Simulador de atomos 3D">
         <div className="scene-frame">
           <AtomScene />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function MoleculeView() {
+  const controlsSlot = useSimulationStore((state) => state.controlsSlot);
+  return (
+    <main className="workspace moleculas-grid">
+      <div className="left-column">
+        {controlsSlot ? createPortal(<MoleculeControls embedded />, controlsSlot) : <MoleculeControls />}
+        <ScientificNotice scope="moleculas" />
+      </div>
+      <section className="stage" aria-label="Simulador de moleculas 3D">
+        <div className="scene-frame">
+          <MoleculeScene />
         </div>
       </section>
     </main>
@@ -455,6 +476,16 @@ function DocumentationView() {
               con su identificador, modelo y estado (creada, corriendo, completada,
               cancelada). Util para recuperar el id de una simulacion anterior y volver a
               pedir sus observables o exportarla.
+            </p>
+          </article>
+          <article>
+            <h3>Moleculas</h3>
+            <p>
+              Muestra moleculas pequenas (H2O, CO2, NH3, CH4, etc.) construidas con los mismos
+              atomos reales de la vista Atomos, colocados en su geometria de enlace
+              experimental (longitudes y angulos tabulados). No calcula orbitales moleculares
+              ni fuerzas de enlace: es una composicion visual de atomos reales, no una
+              simulacion de quimica cuantica molecular.
             </p>
           </article>
         </div>
@@ -702,6 +733,40 @@ function DocumentationView() {
           </article>
         </div>
 
+        <h2 className="doc-section-title">Simulador de moleculas: que es real y que es aproximacion</h2>
+        <div className="doc-grid">
+          <article>
+            <h3>Atomos reales, geometria experimental fija</h3>
+            <p>
+              Cada atomo de la molecula es el mismo modelo hibrido nucleo+nube electronica de
+              la vista Atomos (misma funcion de onda hidrogenoide real, mismo apantallamiento
+              de Slater). Las longitudes y angulos de enlace (p.ej. O-H = 0.96 Å y H-O-H =
+              104.5° en el agua) son valores experimentales tabulados de quimica estandar, no
+              inventados.
+            </p>
+          </article>
+          <article>
+            <h3>Sin orbitales moleculares ni fuerzas de enlace</h3>
+            <p>
+              En una molecula real los orbitales atomicos se combinan en orbitales moleculares
+              compartidos entre nucleos (enlaces covalentes), y la geometria de equilibrio
+              surge de minimizar la energia electronica. Este simulador <strong>no</strong>{" "}
+              calcula orbitales moleculares ni resuelve ninguna fuerza de enlace: coloca cada
+              atomo aislado en una posicion fija tomada de tablas experimentales. Es una
+              composicion visual, no una simulacion de estructura electronica molecular.
+            </p>
+          </article>
+          <article>
+            <h3>Orden de enlace: notacion de Lewis</h3>
+            <p>
+              El numero de lineas dibujadas entre dos nucleos (1, 2 o 3) sigue la convencion
+              de Lewis para enlace simple/doble/triple. Es una notacion de libro de texto, no
+              una medicion de densidad de enlace ni una prediccion de orden de enlace real
+              (que en moleculas con resonancia, como el CO2 o el SO2, puede ser fraccionario).
+            </p>
+          </article>
+        </div>
+
         <h2 className="doc-section-title">Como validar los resultados</h2>
         <div className="doc-grid">
           <article>
@@ -787,6 +852,7 @@ export default function App() {
         {activeView === "laboratorio" && <LabView />}
         {activeView === "lattice" && <LatticeView />}
         {activeView === "atomos" && <AtomView />}
+        {activeView === "moleculas" && <MoleculeView />}
         {activeView === "gravedad" && <GravityView />}
         {activeView === "comparador" && <CompareView />}
         {activeView === "historial" && <HistoryView />}

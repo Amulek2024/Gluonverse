@@ -5,7 +5,7 @@
 :root {
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #070a10;
+  background: #000000;
   color: #f8fafc;
 }
 
@@ -19,7 +19,7 @@ body {
   min-height: 100vh;
   background:
     linear-gradient(180deg, rgba(77, 208, 225, 0.06), transparent 24rem),
-    #070a10;
+    #000000;
 }
 
 button,
@@ -33,7 +33,7 @@ button {
   border: 1px solid #2d3748;
   border-radius: 8px;
   color: #f8fafc;
-  background: #172033;
+  background: #0a0a0a;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -46,7 +46,7 @@ button:hover,
 button:focus-visible {
   border-color: #4dd0e1;
   outline: 2px solid transparent;
-  background: #1d2a42;
+  background: #141414;
 }
 
 button:disabled {
@@ -60,7 +60,7 @@ select {
   min-height: 2.25rem;
   border: 1px solid #2d3748;
   border-radius: 8px;
-  background: #0c1220;
+  background: #0a0a0a;
   color: #f8fafc;
   padding: 0.45rem 0.55rem;
 }
@@ -86,7 +86,7 @@ label {
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #1f2937;
-  background: rgba(7, 10, 16, 0.94);
+  background: rgba(0, 0, 0, 0.94);
   backdrop-filter: blur(14px);
 }
 
@@ -148,7 +148,7 @@ label {
 .accessibility-bar button {
   border: 1px solid #2d3748;
   border-radius: 8px;
-  background: #111827;
+  background: #0a0a0a;
   color: #cbd5e1;
   display: inline-flex;
   align-items: center;
@@ -225,7 +225,7 @@ label {
   border: 1px solid #1f2937;
   border-radius: 8px;
   overflow: hidden;
-  background: #070a10;
+  background: #000000;
 }
 
 .notice {
@@ -251,7 +251,7 @@ label {
 .chart {
   border: 1px solid #1f2937;
   border-radius: 8px;
-  background: rgba(17, 24, 39, 0.88);
+  background: rgba(0, 0, 0, 0.88);
 }
 
 .model-strip article {
@@ -285,6 +285,7 @@ label {
 }
 
 .atomos-grid,
+.moleculas-grid,
 .gravedad-grid {
   display: grid;
   grid-template-columns: minmax(26rem, 1fr) minmax(24rem, 1.4fr);
@@ -352,7 +353,7 @@ label {
 .segmented {
   padding: 0.25rem;
   border-radius: 8px;
-  background: #0c1220;
+  background: #0a0a0a;
 }
 
 .segmented button {
@@ -368,7 +369,7 @@ label {
   border: 1px solid #1f2937;
   border-radius: 8px;
   overflow: hidden;
-  background: #070a10;
+  background: #000000;
 }
 
 .status-row {
@@ -398,7 +399,7 @@ label {
   padding: 0.65rem;
   display: grid;
   gap: 0.2rem;
-  background: #0c1220;
+  background: #0a0a0a;
 }
 
 .metric span {
@@ -433,7 +434,7 @@ label {
   padding: 0.15rem 0.1rem;
   border: 1px solid #263244;
   border-radius: 4px;
-  background: #0c1220;
+  background: #0a0a0a;
   color: #e2e8f0;
   cursor: pointer;
 }
@@ -486,7 +487,7 @@ label {
   justify-items: start;
   text-align: left;
   gap: 0.55rem;
-  background: #0c1220;
+  background: #0a0a0a;
 }
 
 .particle-row.selected {
@@ -527,7 +528,7 @@ label {
   border-radius: 8px;
   padding: 0.65rem;
   color: #cbd5e1;
-  background: #070a10;
+  background: #000000;
   font-size: 0.73rem;
 }
 
@@ -553,7 +554,7 @@ label {
   border: 1px solid #263244;
   border-radius: 8px;
   padding: 0.75rem;
-  background: #0c1220;
+  background: #0a0a0a;
 }
 
 .comparison-table span,
@@ -599,7 +600,7 @@ label {
 
 .doc-grid code {
   font-family: "JetBrains Mono", ui-monospace, monospace;
-  background: #0c1220;
+  background: #0a0a0a;
   border-radius: 4px;
   padding: 0.05rem 0.3rem;
   font-size: 0.85em;
@@ -632,6 +633,7 @@ label {
   .lab-grid,
   .lattice-grid,
   .atomos-grid,
+  .moleculas-grid,
   .gravedad-grid {
     grid-template-columns: 1fr;
   }
@@ -686,7 +688,7 @@ label {
   padding: 0.45rem 0.6rem;
   border: 1px solid #1f2937;
   border-radius: 8px;
-  background: rgba(7, 10, 16, 0.65);
+  background: rgba(0, 0, 0, 0.65);
   color: #4dd0e1;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.72rem;
@@ -700,7 +702,7 @@ label {
   min-height: 2rem;
   padding: 0.4rem;
   border: 1px solid #1f2937;
-  background: rgba(7, 10, 16, 0.65);
+  background: rgba(0, 0, 0, 0.65);
   color: #4dd0e1;
 }
 
@@ -712,7 +714,7 @@ label {
   padding: 0.4rem 0.6rem;
   border: 1px solid #1f2937;
   border-radius: 8px;
-  background: rgba(7, 10, 16, 0.65);
+  background: rgba(0, 0, 0, 0.65);
   color: #ffd166;
   font-size: 0.78rem;
   white-space: nowrap;
@@ -725,7 +727,7 @@ label {
   padding: 0.35rem 0.55rem;
   border: 1px solid #1f2937;
   border-radius: 8px;
-  background: rgba(7, 10, 16, 0.65);
+  background: rgba(0, 0, 0, 0.65);
   color: #94a3b8;
   font-size: 0.7rem;
   pointer-events: none;
@@ -740,7 +742,7 @@ label {
   padding: 0.45rem 0.6rem;
   border: 1px solid #1f2937;
   border-radius: 8px;
-  background: rgba(7, 10, 16, 0.65);
+  background: rgba(0, 0, 0, 0.65);
   color: #cbd5e1;
   font-size: 0.72rem;
   pointer-events: none;
@@ -770,7 +772,7 @@ label {
   bottom: 1.25rem;
   z-index: 30;
   border-color: #4dd0e1;
-  background: #123043;
+  background: #0a0a0a;
   color: #4dd0e1;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
 }
@@ -785,7 +787,7 @@ label {
   grid-template-rows: auto 1fr;
   border: 1px solid #2d3748;
   border-radius: 10px;
-  background: rgba(12, 18, 32, 0.98);
+  background: rgba(0, 0, 0, 0.98);
   backdrop-filter: blur(14px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
 }
@@ -852,7 +854,7 @@ label {
   bottom: 1.25rem;
   z-index: 30;
   border-color: #4dd0e1;
-  background: #123043;
+  background: #0a0a0a;
   color: #4dd0e1;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
 }
@@ -868,7 +870,7 @@ label {
   grid-template-rows: auto 1fr;
   border: 1px solid #2d3748;
   border-radius: 10px;
-  background: rgba(12, 18, 32, 0.98);
+  background: rgba(0, 0, 0, 0.98);
   backdrop-filter: blur(14px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
 }

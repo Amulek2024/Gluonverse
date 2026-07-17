@@ -35,7 +35,7 @@ export function EnergyChart({ data }: { data: EnergyPoint[] }) {
           />
           <Tooltip
             contentStyle={{
-              background: "#111827",
+              background: "#0a0a0a",
               border: "1px solid #2D3748",
               color: "#F8FAFC"
             }}

@@ -31,7 +31,7 @@ const SUBSHELL_COLOR: Record<string, string> = {
 // Distribucion de Fibonacci-sphere: reparte N puntos aproximadamente uniformes sobre una
 // esfera. Solo se usa para dar forma visual al cluster de nucleones, no representa la
 // disposicion real de nucleones dentro de un nucleo.
-function fibonacciSpherePoints(count: number, radius: number): Array<[number, number, number]> {
+export function fibonacciSpherePoints(count: number, radius: number): Array<[number, number, number]> {
   if (count <= 0) return [];
   if (count === 1) return [[0, 0, 0]];
   const points: Array<[number, number, number]> = [];
@@ -48,7 +48,7 @@ function fibonacciSpherePoints(count: number, radius: number): Array<[number, nu
 // Cuadricula de referencia espacial (analoga a la del laboratorio de quarks), escalada al
 // radio real del atomo seleccionado para dar una nocion de tamano/distancia. 1 unidad de
 // escena = 1 Angstrom (ver utils/elements.ts).
-function DistanceGrid({ size, divisions }: { size: number; divisions: number }) {
+export function DistanceGrid({ size, divisions }: { size: number; divisions: number }) {
   return <gridHelper args={[size, divisions, "#2a3548", "#1a2333"]} />;
 }
 
@@ -82,7 +82,7 @@ function ShellPartitions({ radii }: { radii: number[] }) {
   );
 }
 
-function Nucleus({ protonPositions, neutronPositions, nucleusRadius }: {
+export function Nucleus({ protonPositions, neutronPositions, nucleusRadius }: {
   protonPositions: Array<[number, number, number]>;
   neutronPositions: Array<[number, number, number]>;
   nucleusRadius: number;
@@ -163,7 +163,7 @@ interface OrbitalRuntime {
 // cambios de estado/shader independientemente de cuanta CPU se ahorre muestreando. Se combinan
 // todos los orbitales en UN solo BufferGeometry (posicion + color por vertice) y un solo
 // <points>, para que el costo de dibujo no crezca con la cantidad de orbitales del elemento.
-function ElectronCloud({
+export function ElectronCloud({
   slots,
   zEffBySubshell,
   elementZ,
@@ -333,10 +333,10 @@ export function AtomScene() {
   return (
     <div
       ref={fullscreenRef}
-      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#0b0f1a" }}
+      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#000000" }}
     >
       <Canvas camera={{ position: [3, 2, 4], fov: 50, near: 0.01, far: 20000 }} dpr={[1, 2]}>
-        <color attach="background" args={["#0b0f1a"]} />
+        <color attach="background" args={["#000000"]} />
         <ambientLight intensity={0.55} />
         <pointLight position={[3, 3, 4]} intensity={1.1} />
         <pointLight position={[-3, -2, -3]} intensity={0.4} color="#4dd0e1" />

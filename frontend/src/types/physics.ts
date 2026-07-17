@@ -34,6 +34,7 @@ export type ViewId =
   | "laboratorio"
   | "lattice"
   | "atomos"
+  | "moleculas"
   | "gravedad"
   | "comparador"
   | "historial"

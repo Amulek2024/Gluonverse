@@ -91,6 +91,8 @@ interface StoreState {
   reducedMotion: boolean;
   selectedElementZ: number;
   setSelectedElement: (z: number) => void;
+  selectedMoleculeId: string;
+  setSelectedMolecule: (id: string) => void;
   setView: (view: ViewId) => void;
   setStatus: (status: SimulationStatus) => void;
   setBackend: (online: boolean, message?: string) => void;
@@ -148,6 +150,8 @@ export const useSimulationStore = create<StoreState>((set, get) => ({
   reducedMotion: false,
   selectedElementZ: 1,
   setSelectedElement: (selectedElementZ) => set({ selectedElementZ }),
+  selectedMoleculeId: "h2o",
+  setSelectedMolecule: (selectedMoleculeId) => set({ selectedMoleculeId }),
   setView: (activeView) => set({ activeView }),
   setStatus: (status) => set({ status }),
   setBackend: (backendOnline, backendMessage = "") => set({ backendOnline, backendMessage }),

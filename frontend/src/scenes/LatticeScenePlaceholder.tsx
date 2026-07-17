@@ -58,13 +58,13 @@ export function LatticeScene({ cells: initialCells, size }: LatticeSceneProps) {
   return (
     <div
       ref={fullscreenRef}
-      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#0b0f1a" }}
+      style={{ width: "100%", height: "100%", position: "relative", borderRadius: 8, overflow: "hidden", background: "#000000" }}
     >
       <Canvas
         camera={{ position: [gridSize * 1.4, gridSize * 1.1, gridSize * 1.6], fov: 50, near: 0.01, far: 20000 }}
         dpr={[1, 2]}
       >
-        <color attach="background" args={["#0b0f1a"]} />
+        <color attach="background" args={["#000000"]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[gridSize, gridSize, gridSize]} intensity={1.1} />
         <pointLight position={[-gridSize, -gridSize, gridSize]} intensity={0.4} color="#5be49b" />
