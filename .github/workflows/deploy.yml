@@ -72,6 +72,10 @@ jobs:
           echo "Activating: $LATEST"
           az containerapp revision activate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST" || true
 
+      - name: One-off - deactivate known broken revision 0000002 (ImagePullFailure)
+        run: |
+          az containerapp revision deactivate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision gluonverse-backend--0000002 || true
+
       - name: Get backend FQDN
         id: get-fqdn
         run: |
