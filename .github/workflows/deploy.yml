@@ -53,10 +53,18 @@ jobs:
             --registry-password "${{ secrets.ACR_PASSWORD }}" \
             --env-vars GLUONVERSE_DATA_DIR=/app/data/simulations GLUONVERSE_EXPORT_DIR=/app/data/exports GLUONVERSE_DATABASE_URL=sqlite:////app/data/simulations/gluonverse.sqlite3 GLUONVERSE_MAX_PARTICLES=64 GLUONVERSE_MAX_LATTICE_SIZE=16 GLUONVERSE_MAX_STEPS=100000
 
-      - name: Force single-revision mode and full traffic to latest
+      - name: Diagnose active revision
         run: |
-          az containerapp revision set-mode -n gluonverse-backend -g "$RESOURCE_GROUP" --mode single
-          az containerapp ingress traffic set -n gluonverse-backend -g "$RESOURCE_GROUP" --revision-weight latest=100
+          echo "Requested image: $IMAGE"
+          echo "Active template image:"
+          az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query "properties.template.containers[0].image" -o tsv
+          echo "Latest revision name:"
+          LATEST=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
+          echo "$LATEST"
+          echo "Revision list:"
+          az containerapp revision list -n gluonverse-backend -g "$RESOURCE_GROUP" -o table
+          echo "Recent console logs for latest revision:"
+          az containerapp logs show -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST" --tail 40 || true
 
       - name: Get backend FQDN
         id: get-fqdn
@@ -120,10 +128,18 @@ jobs:
             --registry-username "${{ secrets.ACR_USERNAME }}" \
             --registry-password "${{ secrets.ACR_PASSWORD }}"
 
-      - name: Force single-revision mode and full traffic to latest
+      - name: Diagnose active revision
         run: |
-          az containerapp revision set-mode -n gluonverse-frontend -g "$RESOURCE_GROUP" --mode single
-          az containerapp ingress traffic set -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision-weight latest=100
+          echo "Requested image: $IMAGE"
+          echo "Active template image:"
+          az containerapp show -n gluonverse-frontend -g "$RESOURCE_GROUP" --query "properties.template.containers[0].image" -o tsv
+          echo "Latest revision name:"
+          LATEST=$(az containerapp show -n gluonverse-frontend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
+          echo "$LATEST"
+          echo "Revision list:"
+          az containerapp revision list -n gluonverse-frontend -g "$RESOURCE_GROUP" -o table
+          echo "Recent console logs for latest revision:"
+          az containerapp logs show -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision "$LATEST" --tail 40 || true
 
       - name: Health check
         run: |
