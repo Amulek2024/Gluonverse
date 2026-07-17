@@ -363,7 +363,7 @@ function assocLaguerre(k: number, alpha: number, x: number): number {
   return current;
 }
 
-function radialShape(n: number, l: number, r: number, a: number): number {
+export function radialShape(n: number, l: number, r: number, a: number): number {
   const rho = (2 * r) / (n * a);
   const laguerre = assocLaguerre(n - l - 1, 2 * l + 1, rho);
   return Math.pow(r, l) * Math.exp(-rho / 2) * laguerre;
@@ -371,7 +371,7 @@ function radialShape(n: number, l: number, r: number, a: number): number {
 
 // Formas reales (no normalizadas) de los armonicos esfericos para l=0..3 (s,p,d,f), en
 // funcion de los cosenos directores (x,y,z)/r. Formulas cerradas estandar.
-function angularShape(l: number, m: number, x: number, y: number, z: number, r: number): number {
+export function angularShape(l: number, m: number, x: number, y: number, z: number, r: number): number {
   if (r < 1e-9) return l === 0 ? 1 : 0;
   const nx = x / r;
   const ny = y / r;
@@ -398,11 +398,18 @@ function angularShape(l: number, m: number, x: number, y: number, z: number, r: 
   return ny * (3 * nx * nx - ny * ny);
 }
 
-function orbitalDensity(n: number, l: number, m: number, x: number, y: number, z: number, a: number): number {
+// Amplitud CON SIGNO de la funcion de onda hidrogenoide real (no su densidad |psi|^2): se
+// expone por separado de orbitalDensity porque la construccion de hibridos/orbitales
+// moleculares (ver utils/molecularOrbitals.ts) necesita sumar/restar amplitudes con signo de
+// varios orbitales antes de elevar al cuadrado (interferencia constructiva/destructiva real),
+// no solo densidades de un unico orbital aislado.
+export function psiAmplitude(n: number, l: number, m: number, x: number, y: number, z: number, a: number): number {
   const r = Math.sqrt(x * x + y * y + z * z);
-  const radial = radialShape(n, l, r, a);
-  const angular = angularShape(l, m, x, y, z, r);
-  const psi = radial * angular;
+  return radialShape(n, l, r, a) * angularShape(l, m, x, y, z, r);
+}
+
+function orbitalDensity(n: number, l: number, m: number, x: number, y: number, z: number, a: number): number {
+  const psi = psiAmplitude(n, l, m, x, y, z, a);
   return psi * psi;
 }
 

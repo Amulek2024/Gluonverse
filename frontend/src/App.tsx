@@ -11,6 +11,7 @@ import {
   FlaskConical,
   GitCompare,
   Home,
+  Magnet,
   Network,
   Orbit,
   PauseCircle,
@@ -25,6 +26,7 @@ import { LatticeControls } from "./controls/LatticeControls";
 import { SimulationControls } from "./controls/SimulationControls";
 import { GravityControls } from "./controls/GravityControls";
 import { MoleculeControls } from "./controls/MoleculeControls";
+import { AtomSandboxControls } from "./controls/AtomSandboxControls";
 import { health, listSimulations } from "./api/client";
 import { useSimulationStore } from "./stores/useSimulationStore";
 import { AtomScene } from "./scenes/AtomScenePlaceholder";
@@ -32,6 +34,7 @@ import { GluonScene } from "./scenes/GluonScenePlaceholder";
 import { LatticeScene } from "./scenes/LatticeScenePlaceholder";
 import { GravityScene } from "./scenes/GravityScenePlaceholder";
 import { MoleculeScene } from "./scenes/MoleculeScenePlaceholder";
+import { AtomSandboxScene } from "./scenes/AtomSandboxScenePlaceholder";
 import type { ViewId } from "./types/physics";
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error?: Error }> {
@@ -69,6 +72,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: typeof Home }> = [
   { id: "lattice", label: "Lattice", icon: Network },
   { id: "atomos", label: "Atomos", icon: Atom },
   { id: "moleculas", label: "Moleculas", icon: Boxes },
+  { id: "interacciones", label: "Interacciones", icon: Magnet },
   { id: "gravedad", label: "Gravedad", icon: Orbit },
   { id: "comparador", label: "Comparador", icon: GitCompare },
   { id: "historial", label: "Historial", icon: Archive },
@@ -264,6 +268,23 @@ function MoleculeView() {
       <section className="stage" aria-label="Simulador de moleculas 3D">
         <div className="scene-frame">
           <MoleculeScene />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function AtomSandboxView() {
+  const controlsSlot = useSimulationStore((state) => state.controlsSlot);
+  return (
+    <main className="workspace interacciones-grid">
+      <div className="left-column">
+        {controlsSlot ? createPortal(<AtomSandboxControls embedded />, controlsSlot) : <AtomSandboxControls />}
+        <ScientificNotice scope="interacciones" />
+      </div>
+      <section className="stage" aria-label="Sandbox de interaccion entre atomos">
+        <div className="scene-frame">
+          <AtomSandboxScene />
         </div>
       </section>
     </main>
@@ -483,9 +504,21 @@ function DocumentationView() {
             <p>
               Muestra moleculas pequenas (H2O, CO2, NH3, CH4, etc.) construidas con los mismos
               atomos reales de la vista Atomos, colocados en su geometria de enlace
-              experimental (longitudes y angulos tabulados). No calcula orbitales moleculares
-              ni fuerzas de enlace: es una composicion visual de atomos reales, no una
-              simulacion de quimica cuantica molecular.
+              experimental (longitudes y angulos tabulados). Cada enlace ademas muestra un
+              orbital molecular LCAO (con hibridacion sp/sp2/sp3 en atomos con 2+ enlaces,
+              inferida del angulo real). No resuelve Hartree-Fock/DFT ni fuerzas de enlace: la
+              geometria sigue siendo fija, no simulada.
+            </p>
+          </article>
+          <article>
+            <h3>Interacciones</h3>
+            <p>
+              Sandbox libre: agrega cualquier atomo real de la tabla periodica y observa como
+              se mueven entre si segun un potencial de Lennard-Jones (radios covalentes reales
+              si el par puede enlazar, van der Waals si alguno es gas noble), con deteccion
+              automatica de enlaces por proximidad geometrica. No calcula orbitales
+              moleculares, energia de enlace real, ni orden de enlace -- es una heuristica
+              geometrica, no una simulacion de dinamica molecular ni de quimica cuantica.
             </p>
           </article>
         </div>
@@ -746,23 +779,97 @@ function DocumentationView() {
             </p>
           </article>
           <article>
-            <h3>Sin orbitales moleculares ni fuerzas de enlace</h3>
+            <h3>Orbitales moleculares LCAO, con hibridacion sp/sp2/sp3</h3>
             <p>
-              En una molecula real los orbitales atomicos se combinan en orbitales moleculares
-              compartidos entre nucleos (enlaces covalentes), y la geometria de equilibrio
-              surge de minimizar la energia electronica. Este simulador <strong>no</strong>{" "}
-              calcula orbitales moleculares ni resuelve ninguna fuerza de enlace: coloca cada
-              atomo aislado en una posicion fija tomada de tablas experimentales. Es una
-              composicion visual, no una simulacion de estructura electronica molecular.
+              Cada enlace muestra un orbital molecular construido por LCAO (Combinacion Lineal
+              de Orbitales Atomicos): se suman las amplitudes con signo (psi_A + psi_B) de los
+              orbitales de valencia de los dos atomos, la construccion real y estandar de
+              quimica cuantica introductoria. Si un atomo tiene 2 o mas enlaces, sus orbitales
+              de valencia se combinan primero en hibridos sp/sp2/sp3 (formulas reales,
+              c_s=sqrt(caracter %s), c_p=sqrt(1-caracter %s)) antes de formar el enlace, con el
+              tipo de hibridacion INFERIDO del angulo real entre los enlaces de ese atomo (no
+              una tabla fija por molecula): ~180° → sp (CO2), ~120° → sp2 (SO2), ~109.5° → sp3
+              (H2O, NH3, CH4).
+            </p>
+          </article>
+          <article>
+            <h3>Limitaciones declaradas del modelo de enlace</h3>
+            <p>
+              Es una aproximacion, no un calculo de Hartree-Fock/DFT: no resuelve el orbital
+              antienlazante, no distingue las componentes sigma y pi de enlaces dobles/triples
+              (la nube LCAO solo representa la parte tipo sigma), no calcula energia de enlace
+              ni geometria de equilibrio (la geometria sigue siendo el valor experimental fijo
+              de la molecula), y no resuelve pares solitarios como hibridos con direccion
+              propia -- esos electrones se siguen mostrando en la nube atomica normal, sin
+              modificar, superpuesta visualmente con la nube de enlace (no hay una contabilidad
+              de conservacion de probabilidad total entre ambas capas).
             </p>
           </article>
           <article>
             <h3>Orden de enlace: notacion de Lewis</h3>
             <p>
               El numero de lineas dibujadas entre dos nucleos (1, 2 o 3) sigue la convencion
-              de Lewis para enlace simple/doble/triple. Es una notacion de libro de texto, no
-              una medicion de densidad de enlace ni una prediccion de orden de enlace real
-              (que en moleculas con resonancia, como el CO2 o el SO2, puede ser fraccionario).
+              de Lewis para enlace simple/doble/triple. Es una notacion de libro de texto,
+              independiente de la nube LCAO, no una medicion de densidad de enlace ni una
+              prediccion de orden de enlace real (que en moleculas con resonancia, como el CO2 o
+              el SO2, puede ser fraccionario).
+            </p>
+          </article>
+        </div>
+
+        <h2 className="doc-section-title">Sandbox de interacciones: que es real y que es aproximacion</h2>
+        <div className="doc-grid">
+          <article>
+            <h3>Dos regimenes de un mismo potencial, no enlaces reales</h3>
+            <p>
+              El movimiento entre atomos sigue un potencial de Lennard-Jones, el modelo real y
+              estandar para interacciones no enlazantes de van der Waals -- reutilizado aqui en
+              DOS regimenes: si ningun atomo del par es un gas noble, la distancia de equilibrio
+              se parametriza con radios covalentes reales (aproxima una distancia de enlace); si
+              alguno es gas noble, se usa la distancia de van der Waals real (contacto no
+              enlazante). Explicitamente <strong>no</strong> calcula energia de enlace real, no
+              resuelve orbitales moleculares, y no distingue enlace covalente de ionico.
+            </p>
+          </article>
+          <article>
+            <h3>Enlaces detectados: heuristica geometrica, no quimica cuantica</h3>
+            <p>
+              La linea entre dos atomos aparece cuando su distancia real es menor a 1.3 veces la
+              suma de sus radios covalentes -- la misma tecnica de "percepcion de enlaces por
+              distancia" que usan herramientas de quimica computacional (OpenBabel, RDKit, ASE)
+              para inferir enlaces a partir de solo coordenadas. Es geometria pura: no verifica
+              valencia disponible (un atomo puede aparecer enlazado con mas vecinos de los que
+              su valencia real permite) y no determina el orden de enlace (simple/doble/triple).
+            </p>
+          </article>
+          <article>
+            <h3>Epsilon uniforme: la simplificacion declarada</h3>
+            <p>
+              La profundidad del pozo de energia (epsilon) es la misma constante para cualquier
+              par de elementos, sea o no "enlazable". En la realidad, la energia de enlace o de
+              dispersion de London varia en ordenes de magnitud segun el par especifico -- un
+              dato que este simulador no tabula. Por eso dos atomos cualquiera se atraen/repelen
+              con la misma "fuerza relativa", en vez de reproducir afinidades quimicas reales.
+            </p>
+          </article>
+          <article>
+            <h3>Radios reales, con extrapolacion declarada</h3>
+            <p>
+              Los radios covalentes (Cordero et al. 2008) y de van der Waals (Bondi 1964) son
+              datos medidos reales, no inventados. Para elementos sin valor tabulado (la mayoria
+              de metales de transicion pesados, lantanidos/actinidos) se usa un estimado
+              generico por periodo, declarado explicitamente como extrapolacion, no un dato
+              medido.
+            </p>
+          </article>
+          <article>
+            <h3>Amortiguamiento: ayuda numerica, no una fuerza real</h3>
+            <p>
+              Cada paso remueve una fraccion de la velocidad de cada atomo. Sin esto, el sistema
+              oscilaria indefinidamente alrededor del punto de equilibrio del potencial (como
+              haria un Lennard-Jones real sin disipacion de energia). Es una ayuda numerica para
+              que la escena se asiente visualmente, igual de declarada que el softening del
+              sandbox de gravedad.
             </p>
           </article>
         </div>
@@ -853,6 +960,7 @@ export default function App() {
         {activeView === "lattice" && <LatticeView />}
         {activeView === "atomos" && <AtomView />}
         {activeView === "moleculas" && <MoleculeView />}
+        {activeView === "interacciones" && <AtomSandboxView />}
         {activeView === "gravedad" && <GravityView />}
         {activeView === "comparador" && <CompareView />}
         {activeView === "historial" && <HistoryView />}

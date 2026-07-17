@@ -35,6 +35,7 @@ export type ViewId =
   | "lattice"
   | "atomos"
   | "moleculas"
+  | "interacciones"
   | "gravedad"
   | "comparador"
   | "historial"
