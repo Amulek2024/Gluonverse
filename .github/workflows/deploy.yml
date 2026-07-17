@@ -66,6 +66,15 @@ jobs:
           echo "Recent console logs for latest revision:"
           az containerapp logs show -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST" --tail 40 || true
 
+      - name: Deactivate old revisions
+        run: |
+          LATEST=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
+          OTHERS=$(az containerapp revision list -n gluonverse-backend -g "$RESOURCE_GROUP" --query "[?name!='$LATEST'].name" -o tsv)
+          for r in $OTHERS; do
+            echo "Deactivating old revision: $r"
+            az containerapp revision deactivate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$r" || true
+          done
+
       - name: Get backend FQDN
         id: get-fqdn
         run: |
@@ -144,6 +153,15 @@ jobs:
           az containerapp revision list -n gluonverse-frontend -g "$RESOURCE_GROUP" -o table
           echo "Recent console logs for latest revision:"
           az containerapp logs show -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision "$LATEST" --tail 40 || true
+
+      - name: Deactivate old revisions
+        run: |
+          LATEST=$(az containerapp show -n gluonverse-frontend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
+          OTHERS=$(az containerapp revision list -n gluonverse-frontend -g "$RESOURCE_GROUP" --query "[?name!='$LATEST'].name" -o tsv)
+          for r in $OTHERS; do
+            echo "Deactivating old revision: $r"
+            az containerapp revision deactivate -n gluonverse-frontend -g "$RESOURCE_GROUP" --revision "$r" || true
+          done
 
       - name: Health check
         run: |
