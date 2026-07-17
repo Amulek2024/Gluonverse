@@ -27,8 +27,19 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Log in to ACR
-        run: az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+      - name: Log in to ACR and fetch admin credentials
+        run: |
+          ACR_NAME=$(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+          az acr login --name "$ACR_NAME"
+          # Read the registry's admin credentials dynamically instead of relying on
+          # ACR_USERNAME/ACR_PASSWORD secrets, which went stale and caused the container
+          # apps to fail image pulls with ImagePullUnauthorized. Requires the ACR admin
+          # user to be enabled.
+          ACR_USER=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
+          ACR_PASS=$(az acr credential show -n "$ACR_NAME" --query "passwords[0].value" -o tsv)
+          echo "::add-mask::$ACR_PASS"
+          echo "ACR_USER=$ACR_USER" >> "$GITHUB_ENV"
+          echo "ACR_PASS=$ACR_PASS" >> "$GITHUB_ENV"
 
       - name: Build and push backend image
         run: |
@@ -49,8 +60,8 @@ jobs:
             --ingress external \
             --target-port 8000 \
             --registry-server "${{ secrets.ACR_LOGIN_SERVER }}" \
-            --registry-username "${{ secrets.ACR_USERNAME }}" \
-            --registry-password "${{ secrets.ACR_PASSWORD }}" \
+            --registry-username "$ACR_USER" \
+            --registry-password "$ACR_PASS" \
             --env-vars GLUONVERSE_DATA_DIR=/app/data/simulations GLUONVERSE_EXPORT_DIR=/app/data/exports GLUONVERSE_DATABASE_URL=sqlite:////app/data/simulations/gluonverse.sqlite3 GLUONVERSE_MAX_PARTICLES=64 GLUONVERSE_MAX_LATTICE_SIZE=16 GLUONVERSE_MAX_STEPS=100000
 
       - name: Diagnose active revision
@@ -71,10 +82,6 @@ jobs:
           LATEST=$(az containerapp show -n gluonverse-backend -g "$RESOURCE_GROUP" --query "properties.latestRevisionName" -o tsv)
           echo "Activating: $LATEST"
           az containerapp revision activate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision "$LATEST" || true
-
-      - name: One-off - deactivate known broken revision 0000002 (ImagePullFailure)
-        run: |
-          az containerapp revision deactivate -n gluonverse-backend -g "$RESOURCE_GROUP" --revision gluonverse-backend--0000002 || true
 
       - name: Get backend FQDN
         id: get-fqdn
@@ -108,8 +115,15 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Log in to ACR
-        run: az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+      - name: Log in to ACR and fetch admin credentials
+        run: |
+          ACR_NAME=$(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
+          az acr login --name "$ACR_NAME"
+          ACR_USER=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
+          ACR_PASS=$(az acr credential show -n "$ACR_NAME" --query "passwords[0].value" -o tsv)
+          echo "::add-mask::$ACR_PASS"
+          echo "ACR_USER=$ACR_USER" >> "$GITHUB_ENV"
+          echo "ACR_PASS=$ACR_PASS" >> "$GITHUB_ENV"
 
       - name: Build and push frontend image
         env:
@@ -139,8 +153,8 @@ jobs:
             --ingress external \
             --target-port 80 \
             --registry-server "${{ secrets.ACR_LOGIN_SERVER }}" \
-            --registry-username "${{ secrets.ACR_USERNAME }}" \
-            --registry-password "${{ secrets.ACR_PASSWORD }}"
+            --registry-username "$ACR_USER" \
+            --registry-password "$ACR_PASS"
 
       - name: Diagnose active revision
         run: |
